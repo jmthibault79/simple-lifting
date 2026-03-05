@@ -145,14 +145,15 @@ User wants to understand their progress over time. They can see aggregated stati
 - **Single User**: App assumes one user per device; no authentication or multi-user support required
 - **Local Storage Only**: Exercise data stored locally on device; no cloud backup or sync
 - **Weight Units**: Primary support for pounds (lbs) with optional kilogram (kg) support; original unit always stored with every weight value
-- **Weight Unit Persistence**: User preference for display unit (lbs/kg) does NOT retroactively convert historical data; stored units are immutable
+- **Weight Unit Persistence**: User preference for display unit (lbs/kg) does NOT retroactively convert historical data; stored units are immutable *(per Constitution Principle VIII: Data Integrity & Format Preservation)*
 - **Offline Operation**: App designed for offline-first usage; no API calls or internet connectivity required
 - **Data Retention**: Exercise data retained indefinitely; no automatic deletion policies
 - **Deletion Granularity**: Users delete individual sets (one at a time), not bulk exercise records
 - **Exercise Search**: Exercise name selection supports search/filter functionality for quick access
 - **Workout Structure**: Exercises tracked at set-level granularity (individual sets are atomic units)
 - **Failed Sets**: App supports recording failed sets (0 reps) to track incomplete/unsuccessful attempts
-- **Time Granularity**: Date only in local timezone; time component not tracked
+- **Time Granularity**: Date only in local timezone; time component not tracked *(format preserved, per Constitution Principle VIII)*
+- **Data Format Preservation**: All unit conversions and display transformations occur as viewing functions only; source data never modified retroactively *(per Constitution Principle VIII: Data Integrity & Format Preservation)*
 - **Notes Scope**: Exercise notes are tracked at the exercise-per-day level (one note per exercise per calendar day), not per individual set
 - **Personal Record**: All-time lifetime maximum weight for each exercise (never resets, not time-windowed)
 - **No Undo**: Deletes are permanent (though user confirmation required)
