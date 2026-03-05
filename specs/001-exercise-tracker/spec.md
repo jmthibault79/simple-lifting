@@ -57,17 +57,6 @@ User wants to understand their progress over time. They can see aggregated stati
 
 ---
 
-### User Story 4 - Quick Entry with Exercise Templates (Priority: P2)
-
-User has favorite exercises they do frequently (e.g., Benchpress, Squats, Deadlifts). They can save these as "templates" and quickly log them by tapping a button, with auto-populated defaults for weight and reps.
-
-**Why this priority**: P2 because it optimizes the workflow for returning users but is not essential for the MVP. Users can always manually enter exercises.
-
-**Acceptance Scenarios**:
-
-1. **Given** user has recorded Benchpress multiple times with typically 185 lbs and 8 reps, **When** they save Benchpress as a template, **Then** a template is created with those defaults
-2. **Given** Benchpress template exists with 185 lbs/8 reps defaults, **When** user taps the template button, **Then** exercise entry form pre-populates with 185 lbs and 8 reps (overrideable)
-
 ---
 
 ### Edge Cases
@@ -82,28 +71,32 @@ User has favorite exercises they do frequently (e.g., Benchpress, Squats, Deadli
 
 ### Functional Requirements
 
-- **FR-001**: System MUST allow users to create a new exercise record with exercise name, weight (with unit selection: lbs/kg), reps, sets, and optional notes
-- **FR-002**: System MUST automatically capture and store the date and time when an exercise is recorded
+- **FR-001**: System MUST allow users to create a new exercise record by selecting from a list of known exercise names (populated from previous exercises + predefined common exercises) or entering a new custom name; list supports search/filter (user types to narrow list)
+- **FR-001b**: System MUST allow users to specify weight (with unit selection: lbs/kg), reps completed (including 0 for failed sets), sets, and optional notes; app stores both weight value AND original unit recorded
+- **FR-002**: System MUST automatically capture and store the date when an exercise is recorded (local timezone, date-only, no time component needed)
 - **FR-003**: System MUST persist all exercise data locally on the device using a reliable database
-- **FR-004**: System MUST display a chronologically-ordered history of all recorded exercises with filtering/sorting options
+- **FR-004**: System MUST display a chronologically-ordered history of all recorded exercises with filtering by exercise name (show records for specific exercise only)
 - **FR-005**: System MUST validate user input (e.g., weight/reps/sets must be positive numbers) and show clear error messages for invalid data
 - **FR-006**: System MUST support editing previously recorded exercises (update weight, reps, sets, or notes)
-- **FR-007**: System MUST support deleting previously recorded exercises with user confirmation
-- **FR-008**: System MUST calculate and display personal record (maximum weight lifted) for each exercise type
-- **FR-009**: System MUST allow users to set weight and rep preferences (lbs vs kg as default unit)
-- **FR-010**: System MUST display a dashboard/home screen with today's session summary and quick-access buttons for recording exercises
+- **FR-007**: System MUST support deleting individual exercise sets (one set at a time) with user confirmation; user selects specific set and confirms deletion
+- **FR-008**: System MUST calculate and display all-time personal record (lifetime maximum weight lifted) for each exercise type
+- **FR-009**: System MUST allow users to set weight unit preference (lbs vs kg); preference affects NEW entries and display conversions, but does NOT retroactively modify stored historical data units
+- **FR-010**: System MUST display a dashboard/home screen showing today's session summary: all exercises recorded today with their weight, reps, sets, and exercise names
 - **FR-011**: System MUST work offline with no internet connection required
 - **FR-012**: System MUST display basic statistics: total workouts recorded, most frequently performed exercise, personal records per exercise
-- **FR-013**: System MUST display line graphs showing weight progression for selected exercises with 4 time range options: last 30 days, last 3 months, last year, all-time
+- **FR-013**: System MUST display line graphs showing weight progression for selected exercises with 4 time range options: last 30 days, last 3 months, last year, all-time; all historical data normalized to user's preferred weight unit for graph display
 - **FR-014**: System MUST allow users to select/deselect multiple exercises (via checkboxes) to display on a single graph for comparison
 - **FR-015**: System MUST aggregate daily maximum weight lifted (one data point per calendar day, showing highest weight across all sessions that day)
 - **FR-016**: System MUST show message "Add more data for a fuller picture" for exercises with fewer than 3 historical records, but still display the minimal graph
 - **FR-017**: System MUST allow exporting graph data as CSV format (selectable exercises, date range, weight values)
+- **FR-018**: System MUST display an empty state on first launch: blank app with prominent "Record Exercise" button and empty history view
+- **FR-019**: System MUST allow users to add notes at the exercise-per-day level (e.g., "Benchpress on March 3: first set clean, second set sloppy")
+- **FR-020**: System MUST export CSV data at per-exercise-instance granularity: one row per set with columns (date, exercise name, weight, original weight unit recorded, reps, set number, notes)
 
 ### Key Entities *(include if feature involves data)*
 
 - **ExerciseSession**: Represents a single completed exercise event
-  - Attributes: id (unique), sessionDate (date), sessionTime (time), totalDurationMinutes (optional), notes (optional)
+  - Attributes: id (unique), sessionDate (date in local timezone, no time component), notes (optional)
   - Relationships: Contains multiple ExerciseSet records
 
 - **Exercise**: Represents a distinct type of exercise
@@ -111,7 +104,7 @@ User has favorite exercises they do frequently (e.g., Benchpress, Squats, Deadli
   - Relationships: One-to-many with ExerciseSet
 
 - **ExerciseSet**: Represents one set of an exercise performed
-  - Attributes: id, exerciseId, sessionId, weight (numeric), weightUnit (lbs/kg), repsRequired (planned), repsCompleted (actual), notes (optional), order (set number)
+  - Attributes: id, exerciseId, sessionId, weight (numeric), weightUnit (lbs/kg), repsCompleted (can be 0 for failed sets), notes (optional), order (set number)
   - Relationships: Belongs to ExerciseSession and Exercise
 
 - **UserPreference**: Stores user settings
@@ -145,15 +138,23 @@ User has favorite exercises they do frequently (e.g., Benchpress, Squats, Deadli
 - Integration with wearables or fitness trackers
 - Detailed workout plan generation
 - Advanced nutrition tracking
+- **Quick-entry templates** (deferred to future work - focus on exercise name list first)
 
 ## Assumptions
 
 - **Single User**: App assumes one user per device; no authentication or multi-user support required
 - **Local Storage Only**: Exercise data stored locally on device; no cloud backup or sync
-- **Weight Units**: Primary support for pounds (lbs) with optional kilogram (kg) support
+- **Weight Units**: Primary support for pounds (lbs) with optional kilogram (kg) support; original unit always stored with every weight value
+- **Weight Unit Persistence**: User preference for display unit (lbs/kg) does NOT retroactively convert historical data; stored units are immutable
 - **Offline Operation**: App designed for offline-first usage; no API calls or internet connectivity required
 - **Data Retention**: Exercise data retained indefinitely; no automatic deletion policies
+- **Deletion Granularity**: Users delete individual sets (one at a time), not bulk exercise records
+- **Exercise Search**: Exercise name selection supports search/filter functionality for quick access
 - **Workout Structure**: Exercises tracked at set-level granularity (individual sets are atomic units)
+- **Failed Sets**: App supports recording failed sets (0 reps) to track incomplete/unsuccessful attempts
+- **Time Granularity**: Date only in local timezone; time component not tracked
+- **Notes Scope**: Exercise notes are tracked at the exercise-per-day level (one note per exercise per calendar day), not per individual set
+- **Personal Record**: All-time lifetime maximum weight for each exercise (never resets, not time-windowed)
 - **No Undo**: Deletes are permanent (though user confirmation required)
 - **Material Design**: UI follows Android Material Design guidelines
 - **Minimum API Level**: Targets Android API 24+ (modern devices)
@@ -161,21 +162,53 @@ User has favorite exercises they do frequently (e.g., Benchpress, Squats, Deadli
 
 ## Clarifications
 
-### Session 2026-03-04
+### Session 2026-03-04 (First batch - Graph Requirements)
 
-- Q: Must the statistics feature include graphs to show progress over time? → A: Yes, graphs must visualize weight progression over time for specific exercises
-- Q: What graph types and time ranges should be supported? → A: Line graphs only with 4 fixed time ranges (last 30 days, last 3 months, last year, all-time)
-- Q: How should the app handle exercises with insufficient data (< 3 records)? → A: Show graph even with 1-2 data points with message: "Add more data for a fuller picture"
-- Q: Can users compare multiple exercises on one graph? → A: Yes, allow unlimited exercises on one graph with user-selectable checkboxes (user can enable/disable each exercise)
-- Q: What does each graph data point represent? → A: One point per day showing the heaviest weight lifted that day for selected exercise(s), aggregated across all sessions
-- Q: Should graphs be exportable? → A: Yes, allow exporting graph data as CSV format for use in external spreadsheets
+- Q: Must the statistics feature include graphs? → A: Yes, with line graphs and 4 fixed time ranges (30d, 3m, 1y, all-time)
+- Q: How to handle insufficient data (< 3 records)? → A: Show minimal graphs with "Add more data for a fuller picture" message
+- Q: Multi-exercise comparison? → A: Yes, unlimited exercises on one graph with checkbox selection
+- Q: Graph data aggregation? → A: One point per day = highest weight lifted that day
+- Q: Export capability? → A: CSV export for external use
+
+### Session 2026-03-04 (Second batch - Additional Clarifications)
+
+- Q: Should we implement quick-entry templates (US4)? → A: Postpone to future work. Focus on exercise name list instead.
+- Q: What should dashboard summary display? → A: All exercises recorded today with their weight, reps, and sets (comprehensive view, not just count)
+- Q: How granular should time tracking be? → A: Date only in local timezone; time component not needed
+- Q: Should app support recording failed sets (0 reps)? → A: Yes, allow 0 reps to track incomplete/failed attempts
+- Q: Exercise name entry method? → A: Provide list of known exercise names (from history + predefined list) with option to add custom name
+
+### Session 2026-03-04 (Third batch - UX & Data Export Clarifications)
+
+- Q: Should personal record be all-time max or time-windowed? → A: All-time maximum (global, never resets based on time filter)
+- Q: What happens on first app launch with no data? → A: Display completely empty state: blank app with "Record Exercise" button and empty history
+- Q: What granularity for CSV export? → A: Per-exercise-instance detail (one row per set with date, exercise, weight, unit, reps, set number, notes)
+- Q: Where should exercise notes be tracked? → A: At exercise-per-day level (e.g., "Benchpress on March 3: set 1 clean, set 2 sloppy"), not per individual set and not session-wide
+- Q: What filtering/sorting in History view? → A: Filter by exercise name (show only specific exercise); reverse chronological sort is default
+
+### Session 2026-03-04 (Fourth batch - Data Integrity & UX Refinements)
+
+- Q: How should weight unit preference changes affect historical data? → A: Store original unit always; preference only affects NEW entries and display conversions (read-only)
+- Q: What can users delete - sets, exercises, or types? → A: Delete individual sets only (one at a time) with confirmation; no bulk deletion
+- Q: How to handle graphs with mixed units (some lbs, some kg)? → A: Normalize all data to user's preferred unit for graph display
+- Q: Should exercise name selection support search? → A: Yes, enable search/filter - user can type to narrow the list
 
 ## Acceptance Criteria Summary
 
 Feature is complete when:
-1. All user stories (P1/P2) have acceptance scenarios passing
-2. All functional requirements (FR-001 through FR-017) are implemented
+1. All user stories (P1/P2 - US4 removed) have acceptance scenarios passing
+2. All functional requirements (FR-001 through FR-020) are implemented
 3. All success criteria metrics are met
 4. Edge cases are handled gracefully with user-friendly error messages
 5. App passes performance targets (30-second session recording, 2-second history load)
 6. Graphs display correctly with 1+ data points and CSV export functions properly
+7. Exercise name selection works with predefined + history-based list + search/filter
+8. Dashboard shows complete today's summary with all exercises, weights, reps, and sets
+9. Failed sets (0 reps) can be recorded and tracked without errors
+10. First launch displays empty state; history filtering by exercise name works
+11. CSV export contains per-set granularity rows with all required columns + original unit
+12. Per-exercise-per-day notes can be added and displayed correctly
+13. Personal record (all-time max) displays accurately and never resets
+14. Weight unit preference affects only NEW entries and display (read-only conversions)
+15. Individual set deletion works with confirmation; no bulk deletion
+16. Mixed-unit graphs normalize to user's preferred unit for display
