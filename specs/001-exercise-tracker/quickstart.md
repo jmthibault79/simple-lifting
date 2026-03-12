@@ -2,18 +2,25 @@
 
 **Phase**: 1 - Design & Contracts  
 **Date**: 2026-03-11  
+**Last Updated**: 2026-03-11 (updated for Android Studio Panda 2 / 2025.3.2)  
 **Target**: Get app building and running on Android device/emulator in <30 minutes
+
+### What's Updated (3/11/2026)
+- ✅ Root `build.gradle.kts`: Removed deprecated `task()` syntax, updated AGP to 8.3.0
+- ✅ App `build.gradle.kts`: Updated SDK targets to API 35, Kotlin to 1.9.23, Java to 17, all dependencies current
+- ✅ `packagingOptions` → `packaging` (new syntax)
+- ✅ Compose BOM to 2025.01.00, Lifecycle to 2.8.0, Room to 2.6.2, Navigation to 2.8.0
 
 ---
 
 ## Prerequisites
 
 - **Mac (your setup)**: macOS 12+ with M1+ processor
-- **Android Studio**: Latest stable version (tested with 2024.1+) - [Download](https://developer.android.com/studio)
+- **Android Studio**: Panda 2 (2025.3.2) or later - [Download](https://developer.android.com/studio)
 - **Android SDK**: Automatically installed by Android Studio
   - Minimum SDK: API 24 (Android 7.0)
-  - Target SDK: API 34 (Android 14) or latest available
-- **Kotlin**: Included in Android Studio
+  - Target SDK: API 35 (Android 15) or latest available
+- **Kotlin**: Included in Android Studio (1.9.23+, auto-configured)
 - **Git**: Already installed (you're using it)
 
 ---
@@ -34,14 +41,9 @@ Create `build.gradle.kts` (root project):
 
 ```kotlin
 plugins {
-    id("java-library")
-    id("com.android.application") version "8.1.0" apply false
-    id("com.android.library") version "8.1.0" apply false
-    id("org.jetbrains.kotlin.android") version "1.9.0" apply false
-}
-
-task("clean", Delete::class) {
-    delete(rootProject.buildDir)
+    id("com.android.application") version "8.3.0" apply false
+    id("com.android.library") version "8.3.0" apply false
+    id("org.jetbrains.kotlin.android") version "1.9.23" apply false
 }
 ```
 
@@ -80,12 +82,12 @@ plugins {
 
 android {
     namespace = "com.example.simplelifting"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.simplelifting"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "0.1.0"
 
@@ -103,12 +105,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
 
     buildFeatures {
@@ -116,10 +118,10 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.11"
     }
 
-    packagingOptions {
+    packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
@@ -128,7 +130,7 @@ android {
 
 dependencies {
     // Jetpack Compose (BOM ensures compatible versions)
-    val composeBom = platform("androidx.compose:compose-bom:2024.01.00")
+    val composeBom = platform("androidx.compose:compose-bom:2025.01.00")
     implementation(composeBom)
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
@@ -137,29 +139,29 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
 
     // Jetpack Lifecycle & ViewModel
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
 
     // Room Database
-    implementation("androidx.room:room-runtime:2.6.1")
-    implementation("androidx.room:room-ktx:2.6.1")
-    ksp("androidx.room:room-compiler:2.6.1")
+    implementation("androidx.room:room-runtime:2.6.2")
+    implementation("androidx.room:room-ktx:2.6.2")
+    ksp("androidx.room:room-compiler:2.6.2")
 
     // Navigation
-    implementation("androidx.navigation:navigation-compose:2.7.7")
+    implementation("androidx.navigation:navigation-compose:2.8.0")
 
     // Core Android
-    implementation("androidx.core:core-ktx:1.13.0")
-    implementation("androidx.activity:activity-compose:1.8.1")
+    implementation("androidx.core:core-ktx:1.14.0")
+    implementation("androidx.activity:activity-compose:1.9.1")
 
     // Testing - Unit
     testImplementation("junit:junit:4.13.2")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:5.1.0")
-    testImplementation("org.mockito:mockito-core:5.5.1")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.1")
+    testImplementation("org.mockito:mockito-core:5.11.0")
 
     // Testing - Instrumented
     androidTestImplementation(composeBom)
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
 
     // Debug
@@ -198,7 +200,7 @@ room {
 1. Android Studio → Device Manager (left sidebar)
 2. Click **Create Device**
 3. Select **Pixel 6** (or your preferred device)
-4. Choose **API 30** (or higher, but not higher than targetSdk)
+4. Choose **API 35** (or API 34, but not lower than API 30)
 5. Click **Create**
 6. Launch emulator from Device Manager
 
@@ -502,9 +504,13 @@ fun ExerciseRecorderScreen() {
 | Issue | Solution |
 |-------|----------|
 | "Gradle build fails with 'cannot find symbol'" | Run `./gradlew clean build` |
-| "Emulator won't start" | Choose a different API level (29-34 most stable) |
-| "Android Studio can't find SDK" | File → Settings → Android SDK → check paths |
-| "Room schema not generated" | Ensure `@Database` annotation present, rebuild |
+| "'task()' is deprecated" error | Ensure root `build.gradle.kts` uses only plugin declarations (no custom tasks) |
+| "Cannot add task 'clean'" error | Don't manually define clean task; Gradle provides it by default |
+| "packagingOptions deprecated" | Updated to `packaging {}` block (see gradle files above) |
+| "Emulator won't start" | Choose a different API level (34-35 most stable); ensure sufficient disk space |
+| "Android Studio can't find SDK" | File → Settings → Android SDK → check paths, ensure SDK is installed |
+| "Compose compiler extension mismatch" | Ensure Kotlin version matches `kotlinCompilerExtensionVersion` in build.gradle |
+| "Room schema not generated" | Ensure `@Database` annotation present, rebuild with `./gradlew clean build` |
 
 ---
 
