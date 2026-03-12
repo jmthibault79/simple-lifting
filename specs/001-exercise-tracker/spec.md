@@ -140,6 +140,18 @@ User wants to understand their progress over time. They can see aggregated stati
 - Advanced nutrition tracking
 - **Quick-entry templates** (deferred to future work - focus on exercise name list first)
 
+## Development Approach: Trust Domain Tooling
+
+**CRITICAL PRINCIPLE**: Android Studio + AGP (Android Gradle Plugin) are domain-specific tools designed to handle gradle bootstrap and dependency management automatically. 
+
+- **Open Android Studio first**, not as a last resort
+- **Don't manually configure gradle internals** (downloading distributions, extracting wrapper jars, hardcoding versions)
+- **When versions conflict, the IDE tells you.** Read the error message and make the suggested fix
+- **Gradle bootstrap happens automatically.** You don't need to understand wrapper generation or maven central URLs
+- **Domain-specific tooling has hard-earned best practices baked in.** Respect that design
+
+Fighting this principle wastes hours on manual debugging that the IDE would have solved in seconds. See the Quickstart for the fastest path to a running app.
+
 ## Assumptions
 
 - **Single User**: App assumes one user per device; no authentication or multi-user support required

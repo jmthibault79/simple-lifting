@@ -75,6 +75,7 @@ Android app enabling users to quickly record weight training exercises (exercise
 - Database migrations: as schema evolves, Room migrations can be complex; plan schema early
 - Timezone handling: storing date-only (not datetime) simplifies most use cases but beware of DST edge cases
 - Graph rendering: performance risk with 1000+ data points; may need viewport clipping or aggregation
+- **CRITICAL**: Don't manually debug gradle internals (version conflicts, gradle wrapper, maven central URLs). Read Android Studio's sync error message instead—it points directly to the fix. Domain-specific tooling (AGP, Gradle plugins) was designed to handle this automatically. Fighting it wastes hours.
 
 ### Tool & Technology Explorations
 - **Jetpack Compose** vs XML: Chosen for modern, declarative UI; lower boilerplate; better testability

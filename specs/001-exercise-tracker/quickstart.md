@@ -2,8 +2,14 @@
 
 **Phase**: 1 - Design & Contracts  
 **Date**: 2026-03-11  
-**Last Updated**: 2026-03-11 (updated for Android Studio Panda 2 / 2025.3.2)  
+**Last Updated**: 2026-03-12 (Critical: Use Android Studio for gradle, not manual config)  
 **Target**: Get app building and running on Android device/emulator in <30 minutes
+
+## CRITICAL LESSON
+
+**Android Studio and AGP (Android Gradle Plugin) are domain-specific tools designed to handle gradle bootstrap and dependency resolution automatically.** Start by opening the IDE, not by manually configuring gradle files. The IDE's error messages are your guide; they point directly to solutions. Avoid spending hours on manual gradle debugging—it's a sign you're not using the right tool.
+
+The quickest path to "app runs": **Use Android Studio's New Project Wizard → Let it generate gradle files → Gradle sync succeeds automatically.**
 
 ### What's Updated (3/11/2026)
 - ✅ Root `build.gradle.kts`: Removed deprecated `task()` syntax, updated AGP to 8.3.0
@@ -25,176 +31,37 @@
 
 ---
 
-## Step 1: Project Setup (5 minutes)
+## Step 1: Create Android Project in Android Studio (5 minutes)
 
-### 1a. Create Android Project Structure
+**Option A: Fastest — Use Android Studio's New Project Wizard** (RECOMMENDED)
 
-```bash
-cd /Users/joel/src/simple-lifting
-mkdir -p android
-cd android
-```
+1. Open Android Studio → File → New → New Android Project
+2. Select **Empty Activity** template
+3. Fill in:
+   - Project name: `SimpleLiftingApp`
+   - Package: `com.example.simplelifting`
+   - Save location: `/Users/joel/src/simple-lifting/android`
+   - Language: **Kotlin**
+   - Minimum SDK: **API 24**
+   - Build system: **Gradle (Kotlin DSL)**
+4. Click **Create**
+5. **Wait for gradle sync to complete** (Android Studio handles all gradle bootstrap automatically)
+6. Green checkmark appears → gradle sync successful
 
-### 1b. Initialize Gradle Project
+Android Studio has generated all gradle files, configured repositories, and resolved versions automatically. No manual gradle editing needed.
 
-Create `build.gradle.kts` (root project):
+**Option B: Import Existing Project**
 
-```kotlin
-plugins {
-    id("com.android.application") version "8.3.0" apply false
-    id("com.android.library") version "8.3.0" apply false
-    id("org.jetbrains.kotlin.android") version "1.9.23" apply false
-}
-```
+1. Open Android Studio → File → Open → `/Users/joel/src/simple-lifting/android`
+2. If gradle sync fails, read the error message in the **Build** tab
+3. Make the small fix suggested by the error (usually a version update)
+4. The IDE re-syncs automatically; green checkmark appears when successful
 
-Create `settings.gradle.kts`:
-
-```kotlin
-pluginManagement {
-    repositories {
-        google()
-        mavenCentral()
-        gradlePluginPortal()
-    }
-}
-
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
-
-rootProject.name = "SimpleLiftingApp"
-include(":app")
-```
-
-Create `app/build.gradle.kts`:
-
-```kotlin
-plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
-    id("androidx.room")
-    id("com.google.devtools.ksp")
-}
-
-android {
-    namespace = "com.example.simplelifting"
-    compileSdk = 35
-
-    defaultConfig {
-        applicationId = "com.example.simplelifting"
-        minSdk = 24
-        targetSdk = 35
-        versionCode = 1
-        versionName = "0.1.0"
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables {
-            useSupportLibrary = true
-        }
-    }
-
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-        }
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-
-    kotlinOptions {
-        jvmTarget = "17"
-    }
-
-    buildFeatures {
-        compose = true
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.11"
-    }
-
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
-}
-
-dependencies {
-    // Jetpack Compose (BOM ensures compatible versions)
-    val composeBom = platform("androidx.compose:compose-bom:2025.01.00")
-    implementation(composeBom)
-    implementation("androidx.compose.ui:ui")
-    implementation("androidx.compose.ui:ui-graphics")
-    implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material3:material3")
-    implementation("androidx.compose.material:material-icons-extended")
-
-    // Jetpack Lifecycle & ViewModel
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
-
-    // Room Database
-    implementation("androidx.room:room-runtime:2.6.2")
-    implementation("androidx.room:room-ktx:2.6.2")
-    ksp("androidx.room:room-compiler:2.6.2")
-
-    // Navigation
-    implementation("androidx.navigation:navigation-compose:2.8.0")
-
-    // Core Android
-    implementation("androidx.core:core-ktx:1.14.0")
-    implementation("androidx.activity:activity-compose:1.9.1")
-
-    // Testing - Unit
-    testImplementation("junit:junit:4.13.2")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.1")
-    testImplementation("org.mockito:mockito-core:5.11.0")
-
-    // Testing - Instrumented
-    androidTestImplementation(composeBom)
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-
-    // Debug
-    debugImplementation("androidx.compose.ui:ui-tooling")
-    debugImplementation("androidx.compose.ui:ui-test-manifest")
-}
-
-room {
-    schemaDirectory("$projectDir/schemas")
-}
-```
+**Why Option A is faster**: The wizard generates gradle files tailored to your environment. Option B requires fixing errors that the wizard would have prevented.
 
 ---
 
-## Step 2: Create Android Project in Android Studio (5 minutes)
-
-### Option A: Import Existing Project
-1. Open Android Studio
-2. File → Open → `/Users/joel/src/simple-lifting/android`
-3. Android Studio detects `build.gradle.kts` and imports
-
-### Option B: Create New Project
-1. File → New → New Android Project
-2. Choose **Empty Activity** template
-3. Project name: `SimpleLiftingApp`
-4. Package: `com.example.simplelifting`
-5. Language: **Kotlin**
-6. Minimum SDK: **API 24**
-7. Select `build system: Gradle (Kotlin DSL)`
-
----
-
-## Step 3: Set Up Virtual Device or Connect Physical Device (5 minutes)
+## Step 2: Set Up Virtual Device or Connect Physical Device (5 minutes)
 
 ### Option A: Virtual Device (Emulator)
 1. Android Studio → Device Manager (left sidebar)
@@ -212,7 +79,7 @@ room {
 
 ---
 
-## Step 4: Create Basic Kotlin Entity Classes (5 minutes)
+## Step 3: Create Basic Kotlin Entity Classes (5 minutes)
 
 Create `app/src/main/kotlin/com/example/simplelifting/model/Exercise.kt`:
 
@@ -294,7 +161,7 @@ data class ExerciseSet(
 
 ---
 
-## Step 5: Create Room Database (5 minutes)
+## Step 4: Create Room Database (5 minutes)
 
 Create `app/src/main/kotlin/com/example/simplelifting/data/AppDatabase.kt`:
 
@@ -367,7 +234,7 @@ class Converters {
 
 ---
 
-## Step 6: Create DAOs (Data Access Objects)
+## Step 5: Create DAOs (Data Access Objects)
 
 Create `app/src/main/kotlin/com/example/simplelifting/data/ExerciseDao.kt`:
 
@@ -410,7 +277,7 @@ Create similar `SessionDao.kt` and `ExerciseSetDao.kt` following the same patter
 
 ---
 
-## Step 7: First Build & Run (5 minutes)
+## Step 6: First Build & Run (5 minutes)
 
 ### Build
 ```bash
@@ -431,7 +298,7 @@ Or in Android Studio: Run → Run 'app'
 
 ---
 
-## Step 8: Create First Composable Screen (Optional Quick Test)
+## Step 7: Create First Composable Screen (Optional Quick Test)
 
 Create `app/src/main/kotlin/com/example/simplelifting/ui/screens/ExerciseRecorderScreen.kt`:
 
