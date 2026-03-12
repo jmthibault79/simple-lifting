@@ -33,6 +33,36 @@
 
 [Gates determined based on constitution file]
 
+## Learning Discovery Gate
+
+*PRINCIPLE IX: Capture learning outcomes, patterns, gotchas, and domain insights. Use this section during planning and research phases to document discoveries for the team and future-self.*
+
+### Patterns & Insights Discovered
+<!-- During research/planning, what patterns emerged? What surprised you? -->
+- [e.g., Domain pattern, library ecosystem observation, Android framework constraint]
+- [e.g., Tool selection rationale, common pitfall to avoid]
+
+### Gotchas & Challenges Identified
+<!-- What unexpected obstacles did planning reveal? What needs extra caution? -->
+- [e.g., Performance limit, API limitation, platform quirk]
+- [e.g., Integration point that needs careful handling]
+
+### Tool & Technology Explorations
+<!-- What tools, libraries, or approaches did you evaluate? Why chosen? -->
+- **[Tool/Approach]**: Why chosen vs [alternative]
+- **[Tool/Approach]**: Why chosen vs [alternative]
+
+### Decision Rationale
+<!-- Why did we make these architectural/structural choices? What were alternatives? -->
+- **[Decision]**: Chosen because... | Alternatives: [list]
+- **[Decision]**: Chosen because... | Alternatives: [list]
+
+### Domain Learnings (Android / LLM / Spec Kit)
+<!-- Knowledge captured about target domain (Android apps, LLM integrations, Spec Kit workflows) -->
+- [e.g., Android lifecycle best practice discovered]
+- [e.g., LLM API pattern or limitation encountered]
+- [e.g., Spec Kit workflow insight or template improvement]
+
 ## Project Structure
 
 ### Documentation (this feature)
