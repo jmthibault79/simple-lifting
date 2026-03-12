@@ -39,6 +39,26 @@ Android app enabling users to quickly record weight training exercises (exercise
 - CLI Interface deferred; primary interface is mobile UI with testable API layer beneath
 - Library-like components (models, repos, use cases) are independently testable without UI
 
+## Technology Refresh Policy
+
+**CRITICAL**: Android/Jetpack ecosystem evolves rapidly. Versions in this spec are authoritative only on their verification date.
+
+| Component | Last Verified | Cadence | Next Review | Truth Source |
+|-----------|---------------|---------|----|---|
+| Android Gradle Plugin (AGP) | 2026-03-11 | Quarterly | 2026-06-11 | [Google Maven](https://maven.google.com/) |
+| Kotlin | 2026-03-11 | Quarterly | 2026-06-11 | [Kotlin Releases](https://github.com/JetBrains/kotlin/releases) |
+| Jetpack Compose | 2026-03-11 | Quarterly | 2026-06-11 | [Jetpack Compose Release Notes](https://developer.android.com/jetpack/androidx/releases/compose) |
+| Room Database | 2026-03-11 | Quarterly | 2026-06-11 | [Room Release Notes](https://developer.android.com/jetpack/androidx/releases/room) |
+| Material Design | 2026-03-11 | Quarterly | 2026-06-11 | [Material 3 Docs](https://m3.material.io) |
+
+**If this spec is > 3 months old**:
+1. ✅ Follow [quickstart.md](quickstart.md) Step 2, Option B: Generate fresh gradle files from Android Studio's New Project Wizard
+2. ✅ Compare generated versions to versions documented here
+3. ✅ If major updates found, regenerate all code samples that reference versions
+4. ✅ Update this table with new verification date + versions
+
+**Constitution X Alignment**: This refresh policy ensures compliance with "Evolving with Best Practices." Stale versions are a violation; quarterly reviews keep the project current.
+
 ## Learning Discovery Gate
 
 *PRINCIPLE IX: Capture learning outcomes, patterns, gotchas, and domain insights. Use this section during planning and research phases to document discoveries for the team and future-self.*
